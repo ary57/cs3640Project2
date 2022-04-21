@@ -25,7 +25,7 @@ def makePackets(flag):
     CODE = 0
     CKSM = 0
     ID = 2
-    SEQ = seq
+    SEQ = 1
 
     if flag == 0:
         TYPE = 8
@@ -44,7 +44,7 @@ def makePackets(flag):
     final = b''
     final += TYPE.to_bytes(1, 'little')
     final += CODE.to_bytes(1, 'little')
-    final += CKSM.to_bytes(2, 'little')
+    final += socket.htons(CKSM).to_bytes(2, 'little')
     final += ID.to_bytes(2,'little')
     final += SEQ.to_bytes(2,'little')    
 
