@@ -1,3 +1,7 @@
+# This is a submission for Sree Lalith Pullapantula and Abhishek Aryal
+# In the included screenshots, one is to uiowa.edu and the other one is for dbs.com.
+# uiowa.edu is located in the United States while dbs is located in Singapore. 
+
 import socket
 import time
 import struct
@@ -21,11 +25,11 @@ def checksum(string):
     answer = answer >> 8 | (answer << 8 & 0xff00)
     return answer
 
-def makePackets(flag):
+def makePackets(flag, seq):
     CODE = 0
     CKSM = 0
     ID = 2
-    SEQ = 1
+    SEQ = seq
 
     if flag == 0:
         TYPE = 8
@@ -51,21 +55,34 @@ def makePackets(flag):
     return final
 
 
-def ping(addr):
+def ping(addr, seq):
     s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
-    req = makePackets(0)
-    res = makePackets(1)
+    req = makePackets(0, seq)
+    res = makePackets(1, seq)
 
     s.connect((addr, 80))
     s.sendall(req)
     start = time.time()
     resp = s.recv(20571)
     while(time.time() - start < 1):
-        if resp[20:] == res:
-            s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
-        print(time.time() - start)
+##        print('resp: ' , resp) # debugging. Remove later
+##        print('resp[20:]: ', resp[20:]) # debugging. Remove later
+##        print('sequence: ', resp[26]) # debugging. Remove later
+
+        # check if the sequence # are the same
+##        if resp[20:] == res[20:]:
+##            s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
+
+        ip = socket.gethostbyname(addr)
+        delta = time.time() - start
+        delta = round(delta, 8)
+        print('dest IP:', ip, '  seq #: ', seq, '  time diff: ', delta)
         break
 
 if __name__ == '__main__':
+    seq = 0
+    addr = input("ping to: ")
     while True:
-        ping('www.uiowa.edu')
+        time.sleep(1.5)
+        ping(addr, seq)
+        seq+=1
